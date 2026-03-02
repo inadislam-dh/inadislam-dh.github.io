@@ -1,0 +1,2652 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Retailomatics – Smart Automation for Food Retail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Heebo:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --accent: #2563EB;
+      --accent-soft: #3B82F6;
+      --accent-glow: rgba(37, 99, 235, .18);
+      --gold: #F59E0B;
+      --gold-soft: rgba(245, 158, 11, .12);
+      --bg: #080C14;
+      --bg2: #0D1220;
+      --bg3: #111827;
+      --surface: rgba(255, 255, 255, .04);
+      --surface2: rgba(255, 255, 255, .07);
+      --border: rgba(255, 255, 255, .08);
+      --border2: rgba(255, 255, 255, .14);
+      --text: #F1F5F9;
+      --text2: #94A3B8;
+      --text3: #64748B;
+      --nav-bg: rgba(8, 12, 20, .88);
+      --card-shadow: 0 8px 40px rgba(0, 0, 0, .45);
+      --r: 14px;
+      --rs: 8px;
+      --ease: cubic-bezier(.4, 0, .2, 1);
+      --t: .3s;
+      --fh: 'Syne', sans-serif;
+      --fb: 'DM Sans', sans-serif;
+      --fhe: 'Heebo', sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #F8FAFC;
+      --bg2: #FFFFFF;
+      --bg3: #EFF6FF;
+      --surface: rgba(0, 0, 0, .03);
+      --surface2: rgba(0, 0, 0, .06);
+      --border: rgba(0, 0, 0, .08);
+      --border2: rgba(0, 0, 0, .13);
+      --text: #0F172A;
+      --text2: #475569;
+      --text3: #94A3B8;
+      --nav-bg: rgba(248, 250, 252, .9);
+      --card-shadow: 0 4px 24px rgba(0, 0, 0, .09);
+      --accent-glow: rgba(37, 99, 235, .1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: auto
+    }
+
+    /* we do our own smooth */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      transition: background .35s var(--ease), color .35s var(--ease)
+    }
+
+    body.he {
+      direction: rtl;
+      font-family: var(--fhe)
+    }
+
+    body.en .he,
+    body.he .en {
+      display: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 99px
+    }
+
+    [data-theme="dark"] body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9998;
+      opacity: .7
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(16px, 4vw, 56px);
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      transition: background .35s, border-color .35s, box-shadow .35s
+    }
+
+    nav.scrolled {
+      box-shadow: 0 4px 32px rgba(0, 0, 0, .18)
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      cursor: pointer
+    }
+
+    .nav-logo-svg {
+      width: 40px;
+      height: 40px
+    }
+
+    .nav-wordmark {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -.02em;
+      color: var(--text)
+    }
+
+    .nav-wordmark em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+      margin: 0 auto;
+      padding: 0 20px
+    }
+
+    .nav-links a {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: color var(--t), background var(--t);
+      cursor: pointer
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--surface2)
+    }
+
+    body.he .nav-links a {
+      font-family: var(--fhe)
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0
+    }
+
+    .control-pill {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 3px;
+      gap: 2px
+    }
+
+    .ctrl-btn {
+      padding: 5px 12px;
+      border-radius: 99px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: all var(--t) var(--ease);
+      font-family: inherit
+    }
+
+    .ctrl-btn.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, .4)
+    }
+
+    .theme-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--t);
+      font-size: 16px;
+      line-height: 1
+    }
+
+    .theme-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .nav-cta-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all var(--t) var(--ease);
+      font-family: inherit
+    }
+
+    .nav-cta-btn:hover {
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(37, 99, 235, .4)
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 4.5px;
+      cursor: pointer;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface)
+    }
+
+    .hamburger span {
+      display: block;
+      width: 20px;
+      height: 1.5px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all var(--t) var(--ease)
+    }
+
+    .hamburger.open span:nth-child(1) {
+      transform: rotate(45deg) translate(4.5px, 4.5px)
+    }
+
+    .hamburger.open span:nth-child(2) {
+      opacity: 0
+    }
+
+    .hamburger.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(4.5px, -4.5px)
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 68px;
+      left: 0;
+      right: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      padding: 20px clamp(16px, 4vw, 56px);
+      z-index: 999;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .mobile-nav.open {
+      display: flex
+    }
+
+    .mobile-nav a {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text2);
+      transition: all var(--t);
+      cursor: pointer
+    }
+
+    .mobile-nav a:hover {
+      color: var(--text);
+      background: var(--surface2)
+    }
+
+    body.he .mobile-nav a {
+      font-family: var(--fhe)
+    }
+
+    .mob-footer {
+      margin-top: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 100px clamp(16px, 4vw, 56px) 80px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none
+    }
+
+    .b1 {
+      width: 600px;
+      height: 600px;
+      top: -100px;
+      left: -200px;
+      background: radial-gradient(circle, rgba(37, 99, 235, .15) 0%, transparent 70%);
+      animation: bF 12s ease-in-out infinite
+    }
+
+    .b2 {
+      width: 500px;
+      height: 500px;
+      bottom: -100px;
+      right: -150px;
+      background: radial-gradient(circle, rgba(245, 158, 11, .09) 0%, transparent 70%);
+      animation: bF 16s ease-in-out infinite reverse
+    }
+
+    .b3 {
+      width: 350px;
+      height: 350px;
+      top: 40%;
+      left: 50%;
+      background: radial-gradient(circle, rgba(37, 99, 235, .07) 0%, transparent 70%);
+      animation: bF 20s ease-in-out infinite 3s
+    }
+
+    @keyframes bF {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1)
+      }
+
+      33% {
+        transform: translate(30px, -20px) scale(1.05)
+      }
+
+      66% {
+        transform: translate(-20px, 30px) scale(.97)
+      }
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%)
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 5vw, 80px);
+      align-items: center
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px 5px 8px;
+      background: var(--gold-soft);
+      border: 1px solid rgba(245, 158, 11, .25);
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 22px
+    }
+
+    .badge-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px
+    }
+
+    h1 {
+      font-family: var(--fh);
+      font-size: clamp(36px, 4.5vw, 62px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -.03em;
+      color: var(--text);
+      margin-bottom: 22px
+    }
+
+    body.he h1 {
+      font-family: var(--fhe);
+      letter-spacing: 0;
+      line-height: 1.22
+    }
+
+    .tg {
+      background: linear-gradient(135deg, var(--accent) 0%, #60A5FA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .hero-desc {
+      font-size: clamp(15px, 1.5vw, 17.5px);
+      color: var(--text2);
+      line-height: 1.75;
+      max-width: 480px;
+      margin-bottom: 36px
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 48px
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all var(--t) var(--ease);
+      font-family: inherit
+    }
+
+    body.he .btn {
+      font-family: var(--fhe)
+    }
+
+    .btn-p {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, .3)
+    }
+
+    .btn-p:hover {
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(37, 99, 235, .4)
+    }
+
+    .btn-g {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border2)
+    }
+
+    .btn-g:hover {
+      background: var(--surface2);
+      transform: translateY(-2px)
+    }
+
+    .hero-proof {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap
+    }
+
+    .pnum {
+      font-family: var(--fh);
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -.02em
+    }
+
+    .pnum span {
+      color: var(--accent)
+    }
+
+    .plbl {
+      font-size: 12px;
+      color: var(--text3);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-top: 3px
+    }
+
+    body.he .plbl {
+      letter-spacing: 0
+    }
+
+    /* hero visual */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative
+    }
+
+    .card-stack {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 1.05
+    }
+
+    .fc {
+      position: absolute;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 18px 20px;
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(12px);
+      transition: background var(--t), border-color var(--t)
+    }
+
+    .fc:nth-child(1) {
+      top: 0;
+      left: 0;
+      right: 0;
+      animation: fcF 6s ease-in-out infinite
+    }
+
+    .fc:nth-child(2) {
+      top: 27%;
+      left: 8%;
+      right: 8%;
+      animation: fcF 8s ease-in-out -3s infinite
+    }
+
+    .fc:nth-child(3) {
+      bottom: 0;
+      left: 4%;
+      right: 4%;
+      animation: fcF 7s ease-in-out -1.5s infinite
+    }
+
+    @keyframes fcF {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-8px)
+      }
+    }
+
+    .fc-hd {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px
+    }
+
+    .fc-ic {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(37, 99, 235, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px
+    }
+
+    .fc-ti {
+      font-weight: 600;
+      font-size: 13.5px;
+      color: var(--text)
+    }
+
+    .fc-su {
+      font-size: 11.5px;
+      color: var(--text3)
+    }
+
+    .fc-bar {
+      height: 5px;
+      border-radius: 99px;
+      background: var(--surface2);
+      overflow: hidden;
+      margin-bottom: 8px
+    }
+
+    .fc-bf {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), #60A5FA);
+      animation: bAnim 3s ease-in-out infinite
+    }
+
+    @keyframes bAnim {
+      0% {
+        width: 20%
+      }
+
+      50% {
+        width: 85%
+      }
+
+      100% {
+        width: 20%
+      }
+    }
+
+    .fc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px
+    }
+
+    .fc-row span {
+      color: var(--text2)
+    }
+
+    .fc-row strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .fc-spark {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 36px;
+      margin-top: 10px
+    }
+
+    .sp {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      background: var(--accent);
+      animation: spA 2s ease-in-out infinite
+    }
+
+    .sp:nth-child(2) {
+      animation-delay: .2s;
+      opacity: .6
+    }
+
+    .sp:nth-child(3) {
+      animation-delay: .4s;
+      opacity: .8
+    }
+
+    .sp:nth-child(4) {
+      animation-delay: .6s;
+      opacity: .9
+    }
+
+    .sp:nth-child(5) {
+      animation-delay: .8s;
+      opacity: 1
+    }
+
+    .sp:nth-child(6) {
+      animation-delay: .6s;
+      opacity: .75
+    }
+
+    .sp:nth-child(7) {
+      animation-delay: .4s;
+      opacity: .5
+    }
+
+    @keyframes spA {
+
+      0%,
+      100% {
+        transform: scaleY(.5)
+      }
+
+      50% {
+        transform: scaleY(1.2)
+      }
+    }
+
+    .pulse-r {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 1px solid rgba(37, 99, 235, .1);
+      animation: pR 4s ease-out infinite;
+      pointer-events: none
+    }
+
+    .pulse-r:nth-child(2) {
+      animation-delay: 1.4s
+    }
+
+    .pulse-r:nth-child(3) {
+      animation-delay: 2.8s
+    }
+
+    @keyframes pR {
+      0% {
+        transform: translate(-50%, -50%) scale(.5);
+        opacity: 1
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0
+      }
+    }
+
+    /* ── TRUSTED ── */
+    .trusted {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 28px clamp(16px, 4vw, 56px);
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 3vw, 48px);
+      overflow: hidden;
+      flex-wrap: wrap
+    }
+
+    .trusted-lbl {
+      font-size: 11.5px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .trusted-logos {
+      display: flex;
+      gap: clamp(20px, 3vw, 40px);
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .tlogo {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text3);
+      transition: color var(--t)
+    }
+
+    .tlogo:hover {
+      color: var(--text2)
+    }
+
+    /* ── DYNAMIC LOGO + MARQUEE ── */
+    #nav-logo {
+      transition: opacity 0.4s ease;
+    }
+
+    /* Trusted Marquee */
+    .trusted-logos {
+      display: flex;
+      gap: clamp(20px, 3vw, 40px);
+      white-space: nowrap;
+      overflow: hidden;
+      padding: 0 20px;
+    }
+
+    .trusted-logos-inner {
+      display: flex;
+      gap: clamp(20px, 3vw, 40px);
+      animation: marquee 35s linear infinite;
+    }
+
+    body.he .trusted-logos-inner {
+      animation-direction: reverse;
+      /* Right to Left in Hebrew */
+    }
+
+    @keyframes marquee {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* Duplicate content for seamless loop */
+    .trusted-logos-inner {
+      animation: marquee 35s linear infinite;
+    }
+
+    /* ── SECTION COMMONS ── */
+    .section {
+      padding: clamp(72px, 8vw, 120px) clamp(16px, 4vw, 56px);
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1.5px;
+      background: var(--accent)
+    }
+
+    body.he .eyebrow {
+      flex-direction: row-reverse
+    }
+
+    body.he .eyebrow::before {
+      display: none
+    }
+
+    body.he .eyebrow::after {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1.5px;
+      background: var(--accent)
+    }
+
+    h2 {
+      font-family: var(--fh);
+      font-size: clamp(28px, 3.5vw, 46px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.025em;
+      color: var(--text);
+      margin-bottom: 18px
+    }
+
+    body.he h2 {
+      font-family: var(--fhe);
+      letter-spacing: 0;
+      line-height: 1.3
+    }
+
+    .lead {
+      font-size: clamp(15px, 1.4vw, 17px);
+      color: var(--text2);
+      line-height: 1.8;
+      max-width: 560px;
+      margin-bottom: 52px
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0 clamp(16px, 4vw, 56px)
+    }
+
+    /* ── WHO ── */
+    #who .section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: clamp(40px, 5vw, 80px)
+    }
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px
+    }
+
+    .feat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 22px;
+      transition: all var(--t) var(--ease)
+    }
+
+    .feat-card:hover {
+      border-color: rgba(37, 99, 235, .35);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(37, 99, 235, .08)
+    }
+
+    .fc-icon2 {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      margin-bottom: 12px
+    }
+
+    .fc-t2 {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px
+    }
+
+    body.he .fc-t2 {
+      font-family: var(--fhe)
+    }
+
+    .fc-d2 {
+      font-size: 12.5px;
+      color: var(--text3);
+      line-height: 1.5
+    }
+
+    /* ── FLOW ── */
+    #what {
+      background: var(--bg2);
+      transition: background var(--t)
+    }
+
+    .flow-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(72px, 8vw, 120px) clamp(16px, 4vw, 56px)
+    }
+
+    .flow-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 5vw, 72px);
+      align-items: start
+    }
+
+    .flow-list {
+      display: flex;
+      flex-direction: column
+    }
+
+    .fstep {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      opacity: .42;
+      transition: opacity var(--t)
+    }
+
+    .fstep:last-child {
+      border-bottom: none
+    }
+
+    .fstep.active {
+      opacity: 1
+    }
+
+    body.he .fstep {
+      flex-direction: row-reverse
+    }
+
+    .fnum {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1.5px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--text3);
+      transition: all var(--t) var(--ease)
+    }
+
+    .fstep.active .fnum {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 6px var(--accent-glow)
+    }
+
+    .fstep-t {
+      font-weight: 700;
+      font-size: 15.5px;
+      color: var(--text);
+      margin-bottom: 4px
+    }
+
+    body.he .fstep-t {
+      font-family: var(--fhe)
+    }
+
+    .fstep-d {
+      font-size: 13.5px;
+      color: var(--text2);
+      line-height: 1.6;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s var(--ease), opacity .4s;
+      opacity: 0
+    }
+
+    .fstep.active .fstep-d {
+      max-height: 200px;
+      opacity: 1
+    }
+
+    /* flow graphic */
+    .flow-graphic {
+      position: sticky;
+      top: 100px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--card-shadow);
+      transition: background var(--t), border-color var(--t);
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center
+    }
+
+    .fpbar {
+      height: 3px;
+      border-radius: 99px;
+      background: var(--surface2);
+      overflow: hidden;
+      margin-bottom: 24px
+    }
+
+    .fpfill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), #60A5FA);
+      transition: width .6s var(--ease)
+    }
+
+    .fv-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative
+    }
+
+    .fv-s {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 0;
+      opacity: 0;
+      transform: translateX(-14px);
+      transition: opacity .5s var(--ease), transform .5s var(--ease);
+      position: relative
+    }
+
+    body.he .fv-s {
+      flex-direction: row-reverse;
+      transform: translateX(14px)
+    }
+
+    .fv-s.vis {
+      opacity: 1;
+      transform: translateX(0)
+    }
+
+    body.he .fv-s.vis {
+      transform: translateX(0)
+    }
+
+    .fv-s::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      bottom: -16px;
+      width: 2px;
+      height: 16px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity .4s .25s
+    }
+
+    body.he .fv-s::after {
+      left: auto;
+      right: 19px
+    }
+
+    .fv-s.vis:not(:last-child)::after {
+      opacity: 1
+    }
+
+    .fv-ic {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(37, 99, 235, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all var(--t)
+    }
+
+    .fv-s.vis .fv-ic {
+      background: var(--accent);
+      box-shadow: 0 4px 16px rgba(37, 99, 235, .35)
+    }
+
+    .fv-lb {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text2)
+    }
+
+    .fv-s.vis .fv-lb {
+      color: var(--text)
+    }
+
+    body.he .fv-lb {
+      font-family: var(--fhe)
+    }
+
+    .fstatus {
+      margin-top: 20px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text2)
+    }
+
+    .fdot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      animation: dp 2s ease-in-out infinite;
+      flex-shrink: 0
+    }
+
+    @keyframes dp {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+    }
+
+    /* ── SERVICES ── */
+    #services {
+      padding: clamp(72px, 8vw, 120px) clamp(16px, 4vw, 56px);
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    .srv-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px
+    }
+
+    .srv-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all var(--t) var(--ease);
+      position: relative;
+      overflow: hidden
+    }
+
+    .srv-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), #60A5FA);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s var(--ease)
+    }
+
+    body.he .srv-card::before {
+      transform-origin: right
+    }
+
+    .srv-card:hover::before {
+      transform: scaleX(1)
+    }
+
+    .srv-card:hover {
+      border-color: rgba(37, 99, 235, .25);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .15)
+    }
+
+    .srv-ic {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      background: var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px
+    }
+
+    .srv-ti {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text)
+    }
+
+    body.he .srv-ti {
+      font-family: var(--fhe)
+    }
+
+    .srv-de {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6
+    }
+
+    /* ── ADVANTAGE ── */
+    #advantage {
+      background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--t)
+    }
+
+    .adv-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(72px, 8vw, 120px) clamp(16px, 4vw, 56px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(48px, 6vw, 96px);
+      align-items: center
+    }
+
+    .adv-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px
+    }
+
+    .adv-item {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 22px 24px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      transition: all var(--t) var(--ease)
+    }
+
+    body.he .adv-item {
+      flex-direction: row-reverse;
+      text-align: right
+    }
+
+    .adv-item:hover {
+      border-color: rgba(37, 99, 235, .25);
+      box-shadow: 0 8px 32px rgba(37, 99, 235, .06);
+      transform: translateX(4px)
+    }
+
+    body.he .adv-item:hover {
+      transform: translateX(-4px)
+    }
+
+    .adv-ic {
+      flex-shrink: 0;
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(37, 99, 235, .18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px
+    }
+
+    .adv-ti {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 5px
+    }
+
+    body.he .adv-ti {
+      font-family: var(--fhe)
+    }
+
+    .adv-de {
+      font-size: 13.5px;
+      color: var(--text2);
+      line-height: 1.6
+    }
+
+    .adv-badge {
+      background: linear-gradient(135deg, var(--accent) 0%, #1D4ED8 100%);
+      border-radius: 20px;
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      position: relative;
+      overflow: hidden
+    }
+
+    .adv-badge::before {
+      content: '';
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, .12) 0%, transparent 70%)
+    }
+
+    .adv-big {
+      font-family: var(--fh);
+      font-size: 72px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -.04em;
+      position: relative
+    }
+
+    .adv-sub {
+      font-size: 15px;
+      color: rgba(255, 255, 255, .75);
+      position: relative
+    }
+
+    .adv-div {
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, .18);
+      margin: 12px 0;
+      position: relative
+    }
+
+    .adv-desc {
+      font-size: 14px;
+      color: rgba(255, 255, 255, .65);
+      max-width: 240px;
+      position: relative;
+      line-height: 1.6
+    }
+
+    /* ── WHY ── */
+    #why .section {
+      padding-top: 0
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 50px
+    }
+
+    .why-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all var(--t) var(--ease);
+      position: relative;
+      overflow: hidden
+    }
+
+    .why-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--r);
+      background: linear-gradient(135deg, var(--accent-glow), transparent);
+      opacity: 0;
+      transition: opacity var(--t)
+    }
+
+    .why-card:hover {
+      border-color: rgba(37, 99, 235, .3);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 48px rgba(37, 99, 235, .08)
+    }
+
+    .why-card:hover::after {
+      opacity: 1
+    }
+
+    .why-ic {
+      position: relative;
+      z-index: 1;
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(37, 99, 235, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px
+    }
+
+    .why-ti {
+      position: relative;
+      z-index: 1;
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--text)
+    }
+
+    body.he .why-ti {
+      font-family: var(--fhe)
+    }
+
+    .why-de {
+      position: relative;
+      z-index: 1;
+      font-size: 13.5px;
+      color: var(--text2);
+      line-height: 1.7
+    }
+
+    /* ── VISION ── */
+    #vision {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      transition: background var(--t)
+    }
+
+    .vis-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(72px, 8vw, 120px) clamp(16px, 4vw, 56px);
+      text-align: center
+    }
+
+    .vis-inner h2,
+    .vis-inner .eyebrow {
+      justify-content: center;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto
+    }
+
+    .vis-inner .lead {
+      margin: 0 auto 52px;
+      text-align: center
+    }
+
+    .vis-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px
+    }
+
+    .vis-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 36px 24px;
+      text-align: center;
+      transition: all var(--t) var(--ease)
+    }
+
+    .vis-card:hover {
+      border-color: rgba(37, 99, 235, .25);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(37, 99, 235, .07)
+    }
+
+    .vis-ico {
+      font-size: 36px;
+      margin-bottom: 16px
+    }
+
+    .vis-ti {
+      font-family: var(--fh);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--text);
+      margin-bottom: 10px
+    }
+
+    body.he .vis-ti {
+      font-family: var(--fhe)
+    }
+
+    .vis-de {
+      font-size: 13.5px;
+      color: var(--text2);
+      line-height: 1.7
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: clamp(72px, 8vw, 120px) clamp(16px, 4vw, 56px);
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center
+    }
+
+    .contact-card {
+      background: linear-gradient(135deg, var(--accent) 0%, #1D4ED8 100%);
+      border-radius: 24px;
+      padding: clamp(48px, 6vw, 80px);
+      position: relative;
+      overflow: hidden
+    }
+
+    .contact-card::before {
+      content: '';
+      position: absolute;
+      top: -60%;
+      left: -30%;
+      width: 80%;
+      height: 160%;
+      background: radial-gradient(ellipse, rgba(255, 255, 255, .12) 0%, transparent 70%);
+      pointer-events: none
+    }
+
+    .contact-card h2 {
+      color: #fff;
+      margin-bottom: 14px;
+      position: relative
+    }
+
+    .contact-sub {
+      color: rgba(255, 255, 255, .75);
+      font-size: 16px;
+      max-width: 480px;
+      margin: 0 auto 36px;
+      position: relative;
+      line-height: 1.7
+    }
+
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .3);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      transition: all var(--t) var(--ease);
+      position: relative;
+      backdrop-filter: blur(8px)
+    }
+
+    .contact-email:hover {
+      background: rgba(255, 255, 255, .25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .2)
+    }
+
+    .contact-note {
+      color: rgba(255, 255, 255, .5);
+      font-size: 13px;
+      margin-top: 18px;
+      position: relative
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 30px clamp(16px, 4vw, 56px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      transition: border-color var(--t)
+    }
+
+    .foot-brand {
+      font-family: var(--fh);
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--text);
+      letter-spacing: -.02em
+    }
+
+    .foot-brand em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .foot-copy {
+      font-size: 13px;
+      color: var(--text3)
+    }
+
+    .foot-links {
+      display: flex;
+      gap: 18px
+    }
+
+    .foot-links a {
+      font-size: 13px;
+      color: var(--text3);
+      transition: color var(--t)
+    }
+
+    .foot-links a:hover {
+      color: var(--accent)
+    }
+
+    /* ── REVEAL ── */
+    .rev {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease)
+    }
+
+    .rev-l {
+      opacity: 0;
+      transform: translateX(-28px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease)
+    }
+
+    .rev-r {
+      opacity: 0;
+      transform: translateX(28px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease)
+    }
+
+    .rev.vis,
+    .rev-l.vis,
+    .rev-r.vis {
+      opacity: 1;
+      transform: none
+    }
+
+    [data-d="1"] {
+      transition-delay: .1s
+    }
+
+    [data-d="2"] {
+      transition-delay: .2s
+    }
+
+    [data-d="3"] {
+      transition-delay: .3s
+    }
+
+    [data-d="4"] {
+      transition-delay: .4s
+    }
+
+    [data-d="5"] {
+      transition-delay: .5s
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:960px) {
+
+      .hero-inner,
+      .who-inner,
+      #who .section {
+        grid-template-columns: 1fr
+      }
+
+      #who .section {
+        display: block
+      }
+
+      .who-visual-wrap {
+        margin-top: 40px
+      }
+
+      .hero-visual {
+        display: none
+      }
+
+      .flow-inner {
+        grid-template-columns: 1fr
+      }
+
+      .flow-graphic {
+        position: relative;
+        top: auto;
+        margin-bottom: 32px;
+        order: -1
+      }
+
+      .adv-inner {
+        grid-template-columns: 1fr
+      }
+
+      .why-grid {
+        grid-template-columns: 1fr
+      }
+
+      .vis-cards {
+        grid-template-columns: 1fr
+      }
+
+      .nav-links {
+        display: none
+      }
+
+      .hamburger {
+        display: flex
+      }
+
+      .nav-cta-btn {
+        display: none
+      }
+    }
+
+    @media(max-width:640px) {
+      nav {
+        height: 60px
+      }
+
+      .mobile-nav {
+        top: 60px
+      }
+
+      .srv-grid {
+        grid-template-columns: 1fr
+      }
+
+      footer {
+        flex-direction: column;
+        text-align: center
+      }
+
+      .feat-grid {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body class="en" id="top">
+
+  <!-- ════ NAV ════ -->
+  <nav id="navbar">
+    <div class="nav-brand" onclick="smoothTo('#hero')">
+      <img id="nav-logo" src="./images/logo-en-black.png" alt="Retailomatics"
+        style="height:42px; width:auto; transition:opacity .4s ease;">
+    </div>
+
+    <ul class="nav-links">
+      <li><a onclick="smoothTo('#who')"><span class="en">Who We Are</span><span class="he">מי אנחנו</span></a></li>
+      <li><a onclick="smoothTo('#what')"><span class="en">What We Do</span><span class="he">מה אנחנו עושים</span></a>
+      </li>
+      <li><a onclick="smoothTo('#advantage')"><span class="en">Advantage</span><span class="he">היתרון</span></a></li>
+      <li><a onclick="smoothTo('#why')"><span class="en">Why Us</span><span class="he">למה אנחנו</span></a></li>
+      <li><a onclick="smoothTo('#vision')"><span class="en">Vision</span><span class="he">החזון</span></a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <div class="control-pill">
+        <button class="ctrl-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+        <button class="ctrl-btn" id="btn-he" onclick="setLang('he')">עב</button>
+      </div>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="btn btn-p nav-cta-btn" onclick="smoothTo('#contact')">
+        <span class="en">Get Started</span><span class="he">צרו קשר</span>
+      </button>
+    </div>
+
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a onclick="smoothTo('#who');closeMobile()"><span class="en">Who We Are</span><span class="he">מי אנחנו</span></a>
+    <a onclick="smoothTo('#what');closeMobile()"><span class="en">What We Do</span><span class="he">מה אנחנו
+        עושים</span></a>
+    <a onclick="smoothTo('#advantage');closeMobile()"><span class="en">Our Advantage</span><span class="he">היתרון
+        שלנו</span></a>
+    <a onclick="smoothTo('#why');closeMobile()"><span class="en">Why Choose Us</span><span class="he">למה לבחור
+        בנו</span></a>
+    <a onclick="smoothTo('#vision');closeMobile()"><span class="en">Vision</span><span class="he">החזון</span></a>
+    <a onclick="smoothTo('#contact');closeMobile()"><span class="en">Contact</span><span class="he">צור קשר</span></a>
+    <div class="mob-footer">
+      <div class="control-pill">
+        <button class="ctrl-btn active" id="mbtn-en" onclick="setLang('en');closeMobile()">EN</button>
+        <button class="ctrl-btn" id="mbtn-he" onclick="setLang('he');closeMobile()">עב</button>
+      </div>
+      <button class="theme-btn" id="mbtheme-btn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </div>
+
+  <!-- ════ HERO ════ -->
+  <section id="hero">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div>
+        <div class="hero-badge rev"><span class="badge-dot">⚡</span><span class="en">Smart Retail Automation</span><span
+            class="he">אוטומציה חכמה לקמעונאות</span></div>
+        <h1 class="rev" data-d="1">
+          <span class="en">Your Retail at<br><span class="tg">Maximum Velocity</span></span>
+          <span class="he">העסק שלך ב<span class="tg">מהירות מקסימלית</span></span>
+        </h1>
+        <p class="hero-desc rev" data-d="2">
+          <span class="en">Enterprise-grade ERP automation and AI-driven insights for small and medium food retailers.
+            Stop doing manual work — start scaling.</span>
+          <span class="he">אוטומציה ברמת ארגונים גדולים ותובנות AI לקמעונאי מזון קטנים ובינוניים. הפסיקו לעבוד ידנית —
+            התחילו לצמוח.</span>
+        </p>
+        <div class="hero-actions rev" data-d="3">
+          <button class="btn btn-p" onclick="smoothTo('#contact')"><span class="en">Get Started →</span><span
+              class="he">צרו קשר ←</span></button>
+          <button class="btn btn-g" onclick="smoothTo('#what')"><span class="en">See How It Works</span><span
+              class="he">איך זה עובד?</span></button>
+        </div>
+        <div class="hero-proof rev" data-d="4">
+          <div>
+            <div class="pnum"><span>100</span>%</div>
+            <div class="plbl en">Automated ERP Entry</div>
+            <div class="plbl he">הזנה אוטומטית ל-ERP</div>
+          </div>
+          <div>
+            <div class="pnum">AI<span>×</span></div>
+            <div class="plbl en">Powered Insights</div>
+            <div class="plbl he">תובנות מבוססות AI</div>
+          </div>
+          <div>
+            <div class="pnum"><span>SMB</span></div>
+            <div class="plbl en">Focused Service</div>
+            <div class="plbl he">מיוחד לעסקים קטנים</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual rev-r" data-d="2">
+        <div class="pulse-r"></div>
+        <div class="pulse-r"></div>
+        <div class="pulse-r"></div>
+        <div class="card-stack">
+          <div class="fc">
+            <div class="fc-hd">
+              <div class="fc-ic">📊</div>
+              <div>
+                <div class="fc-ti en">ERP Sync Status</div>
+                <div class="fc-ti he">סנכרון ERP</div>
+                <div class="fc-su en">Updated: just now</div>
+                <div class="fc-su he">עודכן: עכשיו</div>
+              </div>
+            </div>
+            <div class="fc-bar">
+              <div class="fc-bf"></div>
+            </div>
+            <div class="fc-row"><span class="en">Invoices processed</span><span class="he">חשבוניות
+                שעובדו</span><strong>247</strong></div>
+            <div class="fc-spark">
+              <div class="sp" style="height:14px"></div>
+              <div class="sp" style="height:22px"></div>
+              <div class="sp" style="height:18px"></div>
+              <div class="sp" style="height:28px"></div>
+              <div class="sp" style="height:36px"></div>
+              <div class="sp" style="height:20px"></div>
+              <div class="sp" style="height:16px"></div>
+            </div>
+          </div>
+          <div class="fc">
+            <div class="fc-hd">
+              <div class="fc-ic">💰</div>
+              <div>
+                <div class="fc-ti en">Profitability Report</div>
+                <div class="fc-ti he">דוח רווחיות</div>
+                <div class="fc-su">↑ 18.4% vs last month</div>
+              </div>
+            </div>
+            <div class="fc-row"><span class="en">Margin optimized</span><span class="he">מרווח שמואטם</span><strong
+                style="color:var(--accent)">+₪3,240</strong></div>
+            <div class="fc-row" style="margin-top:6px"><span class="en">Inventory waste</span><span class="he">בזבוז
+                מלאי</span><strong style="color:#10B981">−42%</strong></div>
+          </div>
+          <div class="fc">
+            <div class="fc-hd">
+              <div class="fc-ic">🤖</div>
+              <div>
+                <div class="fc-ti en">AI Order Recommendation</div>
+                <div class="fc-ti he">המלצת הזמנה AI</div>
+                <div class="fc-su en">6 items need restocking</div>
+                <div class="fc-su he">6 פריטים דרושים להזמנה</div>
+              </div>
+            </div>
+            <div class="fc-bar">
+              <div class="fc-bf" style="animation-delay:1.5s"></div>
+            </div>
+            <div class="fc-row"><span class="en">Confidence</span><span class="he">ציון
+                ביטחון</span><strong>96%</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trusted -->
+  <div class="trusted">
+    <div class="trusted-logos">
+      <div class="trusted-logos-inner">
+        <!-- First set -->
+        <span class="tlogo">Food Retailers</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Supermarkets</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Grocery Chains</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Convenience Stores</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Food Distributors</span>
+
+        <!-- Duplicate for seamless loop -->
+        <span class="tlogo">Food Retailers</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Supermarkets</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Grocery Chains</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Convenience Stores</span>
+        <span class="tlogo" style="opacity:.3">·</span>
+        <span class="tlogo">Food Distributors</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ WHO ════ -->
+  <section id="who">
+    <div class="section">
+      <div class="rev-l">
+        <div class="eyebrow en">About Us</div>
+        <div class="eyebrow he">אודותינו</div>
+        <h2 class="en">Who We Are</h2>
+        <h2 class="he">מי אנחנו</h2>
+        <p class="lead en">Founded to bring the technology and automation revolution to small and medium food retailers.
+          While large chains harness advanced ERP systems, most smaller stores still rely on manual processes — entering
+          delivery notes, updating inventory, adjusting prices by hand.</p>
+        <p class="lead he">החברה הוקמה להביא את מהפכת הטכנולוגיה והאוטומציה לקמעונאי המזון הקטן והבינוני. בעוד רשתות
+          הגדולות מנצלות מערכות ERP מתקדמות, רוב החנויות הקטנות עדיין פועלות ידנית.</p>
+        <p style="font-size:17px;font-weight:600;color:var(--accent);font-style:italic"><span class="en">We're here to
+            change that.</span><span class="he">אנחנו כאן כדי לשנות את זה.</span></p>
+      </div>
+      <div class="who-visual-wrap rev-r">
+        <div class="feat-grid">
+          <div class="feat-card rev" data-d="1">
+            <div class="fc-icon2">🏪</div>
+            <div class="fc-t2 en">Any Retail Store</div>
+            <div class="fc-t2 he">כל חנות קמעונאית</div>
+            <div class="fc-d2 en">From grocery shops to food distributors</div>
+            <div class="fc-d2 he">מחנויות מכולת ועד מפיצי מזון</div>
+          </div>
+          <div class="feat-card rev" data-d="2">
+            <div class="fc-icon2">🤖</div>
+            <div class="fc-t2 en">AI-Powered Core</div>
+            <div class="fc-t2 he">ליבה מבוססת בינה מלאכותית</div>
+            <div class="fc-d2 en">Machine learning at the heart of every process</div>
+            <div class="fc-d2 he">למידת מכונה בלב כל תהליך</div>
+          </div>
+          <div class="feat-card rev" data-d="3">
+            <div class="fc-icon2">⚙️</div>
+            <div class="fc-t2 en">ERP Integration</div>
+            <div class="fc-t2 he">אינטגרציה עם ERP</div>
+            <div class="fc-d2 en">Works seamlessly with your existing ERP</div>
+            <div class="fc-d2 he">עובד בצורה חלקה עם ה-ERP הקיים שלך</div>
+          </div>
+          <div class="feat-card rev" data-d="4">
+            <div class="fc-icon2">📈</div>
+            <div class="fc-t2 en">Real Growth</div>
+            <div class="fc-t2 he">צמיחה אמיתית</div>
+            <div class="fc-d2 en">Measurable impact on your profitability</div>
+            <div class="fc-d2 he">השפעה מדידה על הרווחיות שלך</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════ WHAT WE DO ════ -->
+  <section id="what">
+    <div class="flow-wrap">
+      <div class="eyebrow en rev">Our Process</div>
+      <div class="eyebrow he rev">התהליך שלנו</div>
+      <h2 class="rev en">What We Do</h2>
+      <h2 class="rev he">מה אנחנו עושים</h2>
+      <p class="lead rev en">We replace tedious manual work with smart automated processes — generating
+        business-critical insights for your success every step of the way.</p>
+      <p class="lead rev he">אנו מחליפים עבודה ידנית מייגעת בתהליכים אוטומטיים חכמים — ומייצרים תובנות קריטיות להצלחת
+        העסק שלכם בכל שלב.</p>
+
+      <div class="flow-inner">
+        <!-- Animated graphic -->
+        <div class="flow-graphic rev-r" id="flowGraphic">
+          <div class="fpbar">
+            <div class="fpfill" id="fpFill" style="width:16%"></div>
+          </div>
+          <div class="fv-steps" id="fvSteps">
+            <div class="fv-s" data-s="0">
+              <div class="fv-ic">📦</div>
+              <div>
+                <div class="fv-lb en">Goods &amp; delivery note received</div>
+                <div class="fv-lb he">סחורה ותעודת משלוח נתקבלו</div>
+              </div>
+            </div>
+            <div class="fv-s" data-s="1">
+              <div class="fv-ic">📷</div>
+              <div>
+                <div class="fv-lb en">Document scanned &amp; sent to us</div>
+                <div class="fv-lb he">מסמך נסרק ונשלח אלינו</div>
+              </div>
+            </div>
+            <div class="fv-s" data-s="2">
+              <div class="fv-ic">⚙️</div>
+              <div>
+                <div class="fv-lb en">ERP automatically updated</div>
+                <div class="fv-lb he">ERP מתעדכן אוטומטית</div>
+              </div>
+            </div>
+            <div class="fv-s" data-s="3">
+              <div class="fv-ic">📦</div>
+              <div>
+                <div class="fv-lb en">Inventory &amp; products updated</div>
+                <div class="fv-lb he">מלאי ומוצרים חדשים מתעדכנים</div>
+              </div>
+            </div>
+            <div class="fv-s" data-s="4">
+              <div class="fv-ic">💰</div>
+              <div>
+                <div class="fv-lb en">Prices adjusted for profitability</div>
+                <div class="fv-lb he">מחירים מותאמים לרווחיות</div>
+              </div>
+            </div>
+            <div class="fv-s" data-s="5">
+              <div class="fv-ic">📊</div>
+              <div>
+                <div class="fv-lb en">Sales analyzed &amp; orders optimized</div>
+                <div class="fv-lb he">מכירות מנותחות והזמנות מאופטמות</div>
+              </div>
+            </div>
+          </div>
+          <div class="fstatus">
+            <div class="fdot"></div><span id="fStatEn" class="en">Receiving delivery note...</span><span id="fStatHe"
+              class="he">מקבלים תעודת משלוח...</span>
+          </div>
+        </div>
+
+        <!-- Step list -->
+        <div class="flow-list rev-l" id="flowList">
+          <div class="fstep active" data-s="0">
+            <div class="fnum">1</div>
+            <div>
+              <div class="fstep-t en">Receive Goods &amp; Delivery Note</div>
+              <div class="fstep-t he">קבלת סחורה ותעודת משלוח</div>
+              <div class="fstep-d en">A food retailer receives goods from a supplier along with a delivery note or
+                invoice document.</div>
+              <div class="fstep-d he">קמעונאי המזון מקבל סחורה מהספק יחד עם תעודת משלוח או חשבונית.</div>
+            </div>
+          </div>
+          <div class="fstep" data-s="1">
+            <div class="fnum">2</div>
+            <div>
+              <div class="fstep-t en">Document Scanned &amp; Sent to Us</div>
+              <div class="fstep-t he">המסמך נסרק ונשלח אלינו</div>
+              <div class="fstep-d en">The document is scanned or photographed and sent to our AI system for immediate
+                processing.</div>
+              <div class="fstep-d he">המסמך נסרק ונשלח למערכת ה-AI שלנו לעיבוד מיידי.</div>
+            </div>
+          </div>
+          <div class="fstep" data-s="2">
+            <div class="fnum">3</div>
+            <div>
+              <div class="fstep-t en">ERP Updated Automatically</div>
+              <div class="fstep-t he">ERP מתעדכן אוטומטית</div>
+              <div class="fstep-d en">All data is automatically entered into your ERP — no manual typing, no errors,
+                instant accuracy.</div>
+              <div class="fstep-d he">כל הנתונים מוזנים אוטומטית ל-ERP — ללא הקלדה ידנית, ללא שגיאות.</div>
+            </div>
+          </div>
+          <div class="fstep" data-s="3">
+            <div class="fnum">4</div>
+            <div>
+              <div class="fstep-t en">Inventory &amp; Products Updated</div>
+              <div class="fstep-t he">מלאי ומוצרים מתעדכנים</div>
+              <div class="fstep-d en">Inventory levels are refreshed and new products are automatically added to the
+                system.</div>
+              <div class="fstep-d he">רמות המלאי מתרעננות ומוצרים חדשים נוספים למערכת אוטומטית.</div>
+            </div>
+          </div>
+          <div class="fstep" data-s="4">
+            <div class="fnum">5</div>
+            <div>
+              <div class="fstep-t en">Prices Adjusted for Profitability</div>
+              <div class="fstep-t he">מחירים מותאמים לרווחיות</div>
+              <div class="fstep-d en">Prices are recalculated using live market data and profitability rules to maximize
+                your margins.</div>
+              <div class="fstep-d he">מחירים מחושבים מחדש לפי נתוני שוק חיים וכללי רווחיות למיקסום הרווח.</div>
+            </div>
+          </div>
+          <div class="fstep" data-s="5">
+            <div class="fnum">6</div>
+            <div>
+              <div class="fstep-t en">Sales Analyzed &amp; Orders Optimized</div>
+              <div class="fstep-t he">מכירות מנותחות והזמנות מאופטמות</div>
+              <div class="fstep-d en">AI analyzes sales trends and generates smart order recommendations to prevent
+                shortages and waste.</div>
+              <div class="fstep-d he">AI מנתח מגמות מכירה ומייצר המלצות הזמנה חכמות למניעת מחסור ובזבוז.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════ SERVICES ════ -->
+  <section id="services">
+    <div class="eyebrow en rev">Services</div>
+    <div class="eyebrow he rev">שירותים</div>
+    <h2 class="rev en">Everything Your Store Needs</h2>
+    <h2 class="rev he">כל מה שהחנות שלך צריכה</h2>
+    <p class="lead rev en">A comprehensive suite covering the full operational technology stack for food retailers.</p>
+    <p class="lead rev he">חבילת שירותים מקיפה המכסה את מלא הטכנולוגיה התפעולית עבור קמעונאי המזון.</p>
+    <div class="srv-grid">
+      <div class="srv-card rev" data-d="1">
+        <div class="srv-ic">🔍</div>
+        <div class="srv-ti en">Invoice Scanning &amp; ERP Entry</div>
+        <div class="srv-ti he">סריקת חשבוניות והזנה ל-ERP</div>
+        <div class="srv-de en">Automated scanning and direct entry of all supplier invoices into your ERP.</div>
+        <div class="srv-de he">סריקה אוטומטית והזנה ישירה של חשבוניות הספקים ל-ERP.</div>
+      </div>
+      <div class="srv-card rev" data-d="2">
+        <div class="srv-ic">📦</div>
+        <div class="srv-ti en">Product Setup &amp; Inventory</div>
+        <div class="srv-ti he">הקמת מוצרים ועדכון מלאי</div>
+        <div class="srv-de en">New products added, inventory levels and prices updated automatically.</div>
+        <div class="srv-de he">הוספת מוצרים חדשים, עדכון מלאי ומחירים אוטומטי.</div>
+      </div>
+      <div class="srv-card rev" data-d="3">
+        <div class="srv-ic">💰</div>
+        <div class="srv-ti en">Profitability &amp; Optimization</div>
+        <div class="srv-ti he">רווחיות ואופטימיזציה</div>
+        <div class="srv-de en">Data-driven pricing and inventory optimization to maximize your margins.</div>
+        <div class="srv-de he">תמחור מבוסס נתונים ואופטימיזציית מלאי למיקסום הרווחיות.</div>
+      </div>
+      <div class="srv-card rev" data-d="1">
+        <div class="srv-ic">📊</div>
+        <div class="srv-ti en">Smart Reports &amp; Order Recs</div>
+        <div class="srv-ti he">דוחות חכמים והמלצות הזמנה</div>
+        <div class="srv-de en">AI-powered management reports and smart order recommendations.</div>
+        <div class="srv-de he">דוחות ניהוליים מבוססי AI והמלצות הזמנה חכמות.</div>
+      </div>
+      <div class="srv-card rev" data-d="2">
+        <div class="srv-ic">⚖️</div>
+        <div class="srv-ti en">Price Comparison &amp; Strategy</div>
+        <div class="srv-ti he">השוואת מחירים ואסטרטגיה</div>
+        <div class="srv-de en">Market benchmarking and competitive pricing to keep you ahead.</div>
+        <div class="srv-de he">ייחוס לשוק ותמחור תחרותי לשמירה על יתרון.</div>
+      </div>
+      <div class="srv-card rev" data-d="3">
+        <div class="srv-ic">🔄</div>
+        <div class="srv-ti en">Credits &amp; Price Adjustments</div>
+        <div class="srv-ti he">זיכויים ושינויי מחירים</div>
+        <div class="srv-de en">Full management of credit and supplier price change workflows.</div>
+        <div class="srv-de he">ניהול מלא של זיכויים ושינויי מחירים מהספקים.</div>
+      </div>
+      <div class="srv-card rev" data-d="1">
+        <div class="srv-ic">📒</div>
+        <div class="srv-ti en">Digital Bookkeeping</div>
+        <div class="srv-ti he">הנהלת חשבונות דיגיטלית</div>
+        <div class="srv-de en">Digital bookkeeping services integrated with your business data.</div>
+        <div class="srv-de he">שירותי הנהלת חשבונות דיגיטליים משולבים עם נתוני העסק.</div>
+      </div>
+      <div class="srv-card rev" data-d="2">
+        <div class="srv-ic">🔗</div>
+        <div class="srv-ti en">ERP System Integration</div>
+        <div class="srv-ti he">התממשקות עם מערכת ERP</div>
+        <div class="srv-de en">Seamless integration with your existing ERP — no system changes needed.</div>
+        <div class="srv-de he">התממשקות חלקה עם מערכת ה-ERP הקיימת — ללא שינוי מערכות.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════ ADVANTAGE ════ -->
+  <section id="advantage">
+    <div class="adv-inner">
+      <div>
+        <div class="eyebrow en rev">Why It Matters</div>
+        <div class="eyebrow he rev">מדוע זה חשוב</div>
+        <h2 class="rev en">Our Advantage</h2>
+        <h2 class="rev he">היתרון שלנו</h2>
+        <p class="lead rev en">Countless technologies exist, yet most small retailers fail to harness their power. We
+          take the reins — managing the entire technological side so you focus on growth.</p>
+        <p class="lead rev he">למרות שקיימות אינספור טכנולוגיות, רוב הקמעונאים הקטנים אינם מנצלים אותן. אנחנו לוקחים את
+          המושכות — מנהלים את כל הטכנולוגיה כדי שתתמקדו בצמיחה.</p>
+        <div class="adv-list">
+          <div class="adv-item rev" data-d="1">
+            <div class="adv-ic">🎯</div>
+            <div>
+              <div class="adv-ti en">Full Technology Management</div>
+              <div class="adv-ti he">ניהול טכנולוגי מלא</div>
+              <div class="adv-de en">We handle every aspect so you never need to manage anything technical yourself.
+              </div>
+              <div class="adv-de he">אנחנו מטפלים בכל היבט כדי שלא תצטרכו לנהל דבר טכני בעצמכם.</div>
+            </div>
+          </div>
+          <div class="adv-item rev" data-d="2">
+            <div class="adv-ic">🚀</div>
+            <div>
+              <div class="adv-ti en">Enterprise Power for SMBs</div>
+              <div class="adv-ti he">עוצמה ארגונית לעסקים קטנים</div>
+              <div class="adv-de en">Same capabilities large chains use — at a price point designed for smaller
+                businesses.</div>
+              <div class="adv-de he">אותן יכולות שרשתות גדולות משתמשות בהן — במחיר מתאים לעסקים קטנים.</div>
+            </div>
+          </div>
+          <div class="adv-item rev" data-d="3">
+            <div class="adv-ic">⚡</div>
+            <div>
+              <div class="adv-ti en">Real-Time Accuracy, Always</div>
+              <div class="adv-ti he">דיוק בזמן אמת, תמיד</div>
+              <div class="adv-de en">Your data is always up-to-date — no delays, no manual errors, no data drift.</div>
+              <div class="adv-de he">הנתונים שלכם תמיד עדכניים — ללא עיכובים, שגיאות ידניות, או סחף נתונים.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rev-r">
+        <div class="adv-badge">
+          <div class="adv-big">SMB</div>
+          <div class="adv-sub en">First. Always.</div>
+          <div class="adv-sub he">קודם כל. תמיד.</div>
+          <div class="adv-div"></div>
+          <div class="adv-desc en">Empowering small retailers with the technology of industry giants</div>
+          <div class="adv-desc he">מעצימים קמעונאים קטנים עם הטכנולוגיה של הענקיות</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════ WHY ════ -->
+  <section id="why">
+    <div class="section">
+      <div class="eyebrow en rev">Value Proposition</div>
+      <div class="eyebrow he rev">ערך מוסף</div>
+      <h2 class="rev en">Why Choose Us?</h2>
+      <h2 class="rev he">למה לבחור בנו?</h2>
+      <p class="lead rev en">Four powerful reasons Retailomatics is the right partner for your growth.</p>
+      <p class="lead rev he">ארבעה סיבות מרכזיות מדוע Retailomatics הוא השותף הנכון לצמיחה שלכם.</p>
+      <div class="why-grid">
+        <div class="why-card rev" data-d="1">
+          <div class="why-ic">👥</div>
+          <div class="why-ti en">Save Labor &amp; Operational Costs</div>
+          <div class="why-ti he">חוסכים כוח אדם ועלויות תפעול</div>
+          <div class="why-de en">Replace hours of manual data entry with automated processes. Reduce staffing costs
+            while increasing accuracy and throughput.</div>
+          <div class="why-de he">החלפת שעות הזנה ידנית בתהליכים אוטומטיים. הפחתת עלויות כוח אדם תוך הגדלת הדיוק.</div>
+        </div>
+        <div class="why-card rev" data-d="2">
+          <div class="why-ic">✅</div>
+          <div class="why-ti en">Accurate &amp; Up-to-Date Data, Always</div>
+          <div class="why-ti he">נתונים מדויקים ועדכניים תמיד</div>
+          <div class="why-de en">Your ERP always reflects reality. Inventory, pricing, and product data synchronized in
+            real-time so you always trust your numbers.</div>
+          <div class="why-de he">ה-ERP שלכם תמיד משקף את המציאות. מלאי, מחירים ונתוני מוצרים מסונכרנים בזמן אמת.</div>
+        </div>
+        <div class="why-card rev" data-d="3">
+          <div class="why-ic">💡</div>
+          <div class="why-ti en">Actionable Business Intelligence</div>
+          <div class="why-ti he">מידע עסקי לפעולה</div>
+          <div class="why-de en">Reports and insights that tell you what to do next — not just what happened. Improve
+            profitability with data-driven decisions.</div>
+          <div class="why-de he">דוחות ותובנות שמספרים לכם מה לעשות הלאה — לא רק מה קרה. שפרו רווחיות עם החלטות מבוססות
+            נתונים.</div>
+        </div>
+        <div class="why-card rev" data-d="4">
+          <div class="why-ic">🏆</div>
+          <div class="why-ti en">True Competitive Advantage</div>
+          <div class="why-ti he">יתרון תחרותי אמיתי</div>
+          <div class="why-de en">Level the playing field with large chains. Operate with the same efficiency as the big
+            players — at a fraction of the cost.</div>
+          <div class="why-de he">השוו את הרמה עם רשתות גדולות. פעלו באותה יעילות — בשבריר מהעלות.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ════ VISION ════ -->
+  <section id="vision">
+    <div class="vis-inner">
+      <div class="eyebrow rev en">Our Vision</div>
+      <div class="eyebrow rev he">החזון שלנו</div>
+      <h2 class="rev en">Our Vision</h2>
+      <h2 class="rev he">החזון שלנו</h2>
+      <p class="lead rev en">To make automation and AI accessible to every small and medium retailer — empowering them
+        with the same capabilities as the big players.</p>
+      <p class="lead rev he">להפוך את האוטומציה והבינה המלאכותית לנגישות לכל קמעונאי קטן ובינוני — ולהעניק להם את אותן
+        יכולות של השחקנים הגדולים.</p>
+      <div class="vis-cards">
+        <div class="vis-card rev" data-d="1">
+          <div class="vis-ico">🌍</div>
+          <div class="vis-ti en">Accessible Technology</div>
+          <div class="vis-ti he">טכנולוגיה נגישה</div>
+          <div class="vis-de en">Enterprise tools shouldn't be limited to large corporations. We're changing this for
+            every retailer.</div>
+          <div class="vis-de he">כלי ארגונים לא צריכים להיות שמורים לתאגידים גדולים. אנחנו משנים זאת.</div>
+        </div>
+        <div class="vis-card rev" data-d="2">
+          <div class="vis-ico">⚡</div>
+          <div class="vis-ti en">AI-Driven Future</div>
+          <div class="vis-ti he">עתיד מבוסס בינה מלאכותית</div>
+          <div class="vis-de en">The future of retail belongs to those who embrace intelligent automation. We get you
+            there today.</div>
+          <div class="vis-de he">עתיד הקמעונאות שייך לאלו שמאמצים אוטומציה חכמה. אנחנו מביאים אתכם לשם כיום.</div>
+        </div>
+        <div class="vis-card rev" data-d="3">
+          <div class="vis-ico">🤝</div>
+          <div class="vis-ti en">Your Growth Partner</div>
+          <div class="vis-ti he">שותף לצמיחה שלך</div>
+          <div class="vis-de en">Not just a service provider — a long-term partner committed to growing your business at
+            every step.</div>
+          <div class="vis-de he">לא רק ספק שירות — שותף לטווח ארוך שמחויב לצמיחת העסק שלך בכל שלב.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ CONTACT ════ -->
+  <section id="contact">
+    <div class="contact-card rev">
+      <h2 class="en">Ready to Transform<br>Your Retail Operations?</h2>
+      <h2 class="he">מוכנים לשנות את<br>פעילות הקמעונאות שלכם?</h2>
+      <p class="contact-sub en">Reach out today for a free consultation. Let's explore how Retailomatics can drive your
+        business forward.</p>
+      <p class="contact-sub he">צרו קשר היום לייעוץ חינם. בואו נחקור יחד כיצד Retailomatics יכול להוביל את העסק שלכם
+        קדימה.</p>
+      <a href="mailto:shimri@retailomatics.com" class="contact-email">✉️ shimri@retailomatics.com</a>
+      <p class="contact-note en">We typically respond within 24 hours.</p>
+      <p class="contact-note he">אנחנו בדרך כלל מגיבים תוך 24 שעות.</p>
+    </div>
+  </section>
+
+  <!-- ════ FOOTER ════ -->
+  <footer>
+    <div class="foot-brand">Retail<em>omatics</em></div>
+    <div class="foot-copy"><span class="en">© 2025 Retailomatics · Smart Retail Automation</span><span class="he">© 2025
+        Retailomatics · אוטומציה חכמה לקמעונאות</span></div>
+    <div class="foot-links">
+      <a href="https://www.linkedin.com/company/retailomatics" target="_blank">LinkedIn</a>
+      <a href="mailto:shimri@retailomatics.com"><span class="en">Contact</span><span class="he">צור קשר</span></a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <!-- ════ JS ════ -->
+  <script>
+    $(function () {
+
+      /* ── Smooth scroll ── */
+      function smoothTo(sel) {
+        var $el = $(sel);
+        if ($el.length === 0) return;
+        var offset = $('#navbar').outerHeight() + 8;
+        var top = $el.offset().top - offset;
+        $('html, body').animate({ scrollTop: top }, 800);
+      }
+
+      /* ── Nav scroll ── */
+      $(window).on('scroll', function () {
+        $('#navbar').toggleClass('scrolled', $(window).scrollTop() > 20);
+      });
+
+      /* ── FIXED LANGUAGE SWITCHER (jQuery version) ── */
+      window.setLang = function (l) {
+        $('body').removeClass('en he').addClass(l);
+        $('html').attr({ lang: l, dir: l === 'he' ? 'rtl' : 'ltr' });
+
+        // Sync buttons
+        $('.ctrl-btn').removeClass('active');
+        if (l === 'en') {
+          $('#btn-en, #mbtn-en').addClass('active');
+        } else {
+          $('#btn-he, #mbtn-he').addClass('active');
+        }
+
+        updateLogo();
+      };
+
+      /* ── Theme toggle ── */
+      var isDark = true;
+      window.toggleTheme = function () {
+        isDark = !isDark;
+        $('html').attr('data-theme', isDark ? 'dark' : 'light');
+
+        var icon = isDark ? '🌙' : '☀️';
+        $('#theme-btn, #mbtheme-btn').text(icon);
+
+        updateLogo();
+      };
+
+      function updateLogo() {
+        var lang = $('body').hasClass('he') ? 'he' : 'en';
+        var theme = $('html').attr('data-theme') || 'dark';   // dark by default
+
+        var fileName = '';
+
+        if (theme === 'light') {
+          fileName = (lang === 'he') ? 'logo-he-white.png' : 'logo-en-white.png';
+        } else { // dark / night mode
+          fileName = (lang === 'he') ? 'logo-he-black.png' : 'logo-en-black.png';
+        }
+
+        $('#nav-logo').attr('src', './images/' + fileName);
+      }
+
+      /* ── Mobile nav ── */
+      window.toggleMenu = function () {
+        $('#hamburger').toggleClass('open');
+        $('#mobileNav').toggleClass('open');
+      };
+
+      window.closeMobile = function () {
+        $('#hamburger').removeClass('open');
+        $('#mobileNav').removeClass('open');
+      };
+
+      /* ── Scroll reveal (IntersectionObserver kept – it's the best way) ── */
+      var ro = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            $(e.target).addClass('vis');
+            ro.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      $('.rev, .rev-l, .rev-r').each(function () {
+        ro.observe(this);
+      });
+
+      /* ── Animated 8-Step Flow ── */
+      var STEPS = 6;
+      var STEP_MS = 2400;
+      var statEn = ['Receiving delivery note...', 'Scanning document...', 'Updating ERP automatically...', 'Refreshing inventory & products...', 'Adjusting prices for profitability...', 'Analyzing sales & optimizing orders...'];
+      var statHe = ['מקבלים תעודת משלוח...', 'סורקים מסמך...', 'מעדכנים ERP אוטומטית...', 'מרעננים מלאי ומוצרים...', 'מתאימים מחירים לרווחיות...', 'מנתחים מכירות ומאייטמים הזמנות...'];
+
+      var cur = 0, timer = null, manualTimeout = null, paused = false;
+
+      function renderStep(n) {
+        $('.fstep').removeClass('active')
+          .filter('[data-s="' + n + '"]').addClass('active');
+
+        $('#fpFill').css('width', ((n + 1) / STEPS * 100) + '%');
+
+        $('.fv-s').each(function () {
+          var s = parseInt($(this).data('s'));
+          if (s <= n) {
+            setTimeout(() => $(this).addClass('vis'), s * 110);
+          } else {
+            $(this).removeClass('vis');
+          }
+        });
+
+        $('#fStatEn').text(statEn[n]);
+        $('#fStatHe').text(statHe[n]);
+      }
+
+      function advance() {
+        if (paused) return;
+        cur = (cur + 1) % STEPS;
+        if (cur === 0) {
+          $('.fv-s').removeClass('vis');
+          $('#fpFill').css('width', '0%');
+          setTimeout(() => renderStep(0), 400);
+        } else {
+          renderStep(cur);
+        }
+      }
+
+      function startAuto() {
+        clearInterval(timer);
+        timer = setInterval(advance, STEP_MS);
+      }
+
+      function goToStep(n) {
+        cur = n;
+        paused = true;
+        clearInterval(timer);
+        clearTimeout(manualTimeout);
+        renderStep(n);
+        manualTimeout = setTimeout(function () {
+          paused = false;
+          startAuto();
+        }, 6000);
+      }
+
+      // Click on steps (jQuery version)
+      $('.fstep').on('click', function () {
+        goToStep(parseInt($(this).data('s')));
+      });
+
+      // Start animation when #what is visible
+      var fo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            renderStep(0);
+            startAuto();
+          } else {
+            clearInterval(timer);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      var $whatEl = $('#what');
+      if ($whatEl.length) fo.observe($whatEl[0]);
+
+      /* Auto start in Hebrew for Israeli users (optional) */
+      if (navigator.language.startsWith('he')) {
+        setTimeout(() => {
+          $('#btn-he').trigger('click');   // or setLang('he')
+        }, 800);
+      }
+
+    });
+  </script>
+</body>
+
+</html>
